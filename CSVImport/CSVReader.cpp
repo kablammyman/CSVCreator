@@ -1,35 +1,24 @@
+#include "stdafx.h"
 #include "CSVReader.h"
 #include "StringUtils.h"
+#include "Resource.h"
+
 #include <fstream>
 
 using namespace std;
 
 
-vector<string> results;
 HWND mainWindowHandle;
-HWND indivInputGroupHandle;
-HWND indivInputGroup;
-
-HWND *fieldName;
-HWND *fieldText;
-
-HWND editArea;
-HWND templateArea;
-
-HWND csvHeader;
-HWND csvHeaderText;
-HWND listView;
-HWND numEntriesView;
 vector<CSVHeaderItem>CSVList;
 HINSTANCE mainInst; 
-typedef pair <string, string> CSVDataPair;
-vector<string> editTextVec;
-vector<string> templateTextVec;
-vector<string> csvHeaderVec; 
+
 vector<string> CSV; 
 string internalDelim = "|";
 
-bool FillCSVHeaders(string path,string delim = "\t")
+typedef pair <string, string> CSVDataPair;
+
+
+bool FillCSVHeaders(string path,vector<string> &csvHeaderVec, string delim)
 {
 	csvHeaderVec.clear();
 	
@@ -46,65 +35,50 @@ bool FillCSVHeaders(string path,string delim = "\t")
 		if(headerLine)
 		{
 			csvHeaderVec = StringUtils::Tokenize(line,delim);
+			headerLine = false;
 		}
 		else
 		{
+			CSV.push_back(line);
 		}
 	}
 	myfile.close();
 
-	for (int i = 0; i < csvHeaderVec.size(); i++)
+	/*for (int i = 0; i < csvHeaderVec.size(); i++)
 	{
 		CSVHeaderItem temp;
 		temp.csvHeaderName = csvHeaderVec[i];
 		temp.enabled = false;
 		temp.csvIndex = i;
 		CSVList.push_back(temp);
-	}
+	}*/
 	return true;
 }
 
-void InitMainWindows(HWND hDlg)
-{
-		
+void InitMainWindow(HWND hDlg, vector<string> &csvHeader)
+{	
 	mainWindowHandle = hDlg;
-	
-	defualtCSVHeader.clear();
-	defualtTemplate.clear();
-	defaultInput.clear();
-	
-	hWnd = CreateWindowEx(NULL,BUTTON,"Checkbox",BS_CHECKBOX,xPos,yPos,width,height,parent,NULL,NULL,NULL)
+	int xPos = 25,yPos = 10;
+	int checkSize = 25;
+	int spacing = 35;
+	int width = 50, height = 25;
+	for (int i = 0; i < csvHeader.size(); i++)
+	{
+		CSVHeaderItem newItem;
 
-	HWND hwndChannelList = CreateWindow(
-        L"COMBOBOX",  // Predefined class; Unicode assumed 
-        L"",      // Button text 
-        WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | BS_DEFSPLITBUTTON | CBS_DROPDOWN | CBS_HASSTRINGS | WS_VSCROLL,  // Styles WS_VSCROLL | BS_DEFSPLITBUTTON WS_DISABLED | 
-        10,         // x position 
-        80,         // y position 
-        100,        // Button width
-        200,        // Button height
-        hWnd,     // Parent window
-        (HMENU)IDC_CHANNEL_COUT_BUTTON,       //menu.
-        (HINSTANCE)GetWindowLong(hWnd, GWL_HINSTANCE),
-        NULL);   
+		newItem.checkBox = CreateWindow(TEXT("BUTTON"), TEXT(csvHeader[i].c_str()), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, xPos, yPos+(spacing*(i+1)), width+(csvHeader[i].size()*8), checkSize, hDlg, (HMENU)CHECKBOX_INDEX+i, NULL, NULL);
+		newItem.inputField = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER ,xPos +  width+(csvHeader[i].size()*8)+10, yPos+(spacing*(i+1)),300 ,height , hDlg, (HMENU)INPUTFILED_INDEX+i, NULL, NULL);
+		newItem.csvHeaderName = csvHeader[i];
+		newItem.csvIndex = i;
+		CSVList.push_back(newItem);
+		//newItem.dropDown = CreateWindow(TEXT("COMBOBOX"),TEXT("csv hedaer"), WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST |  CBS_DROPDOWN | CBS_HASSTRINGS | WS_VSCROLL,
+		//	xPos + checkSize,yPos+(spacing*(i+1)),width,height,hDlg,(HMENU)DROPDOWN_INDEX+i, NULL, NULL);
+		
 
-
-	int buttonHeight = 25;
-	csvHeader = CreateWindow(TEXT("STATIC"), TEXT("CSV Header Tempalte"), WS_CHILD | WS_VISIBLE ,X + 10, Y,textAreaWidth ,textHeeight , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
-	csvHeaderText = CreateWindow(TEXT("Edit"), TEXT(defualtCSVHeader.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER, X + (8*19), Y, longInput, textHeeight, hDlg, (HMENU)IDC_CSV_HEADER_TEXT, NULL, NULL);
-	CreateWindow(TEXT("BUTTON"), TEXT("set header"), WS_VISIBLE | WS_CHILD,  X + (8*19)+longInput+10,Y, 100, buttonHeight, hDlg, (HMENU)IDC_EXECUTE_CSV_HEADER_BUTTON, NULL, NULL);
-
-
-	editArea = CreateWindow(TEXT("EDIT"), TEXT(defaultInput.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, X, Y+textHeeight*2,textAreaWidth ,textAreaHeight , hDlg,  // use WM_SIZE and MoveWindow() to size
-	(HMENU)IDC_EDIT_TEXT_WINDOW, GetModuleHandle(NULL), NULL );
-
-	templateArea = CreateWindow(TEXT("EDIT"), TEXT(defualtTemplate.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, textAreaWidth + 10, Y+textHeeight*2,textAreaWidth ,textAreaHeight , hDlg,
-	(HMENU)IDC_TEMPLATE_WINDOW, GetModuleHandle(NULL), NULL );
-	
-	numEntriesView = CreateWindow(TEXT("STATIC"), TEXT(GetNumEntriesText().c_str()), WS_CHILD | WS_VISIBLE ,X + 10+ (textAreaWidth * 2.5), Y+(textHeeight*2),100 ,25 , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
-	
-	
-	CreateWindow(TEXT("BUTTON"), TEXT("submit"), WS_VISIBLE | WS_CHILD, X,ButtonY, 100, buttonHeight, hDlg, (HMENU)IDC_EXECUTE_CSV_INPUT_BUTTON, NULL, NULL);
+	}
+		
+	//numEntriesView = CreateWindow(TEXT("STATIC"), TEXT(GetNumEntriesText().c_str()), WS_CHILD | WS_VISIBLE ,X + 10+ (textAreaWidth * 2.5), Y+(textHeeight*2),100 ,25 , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
+	//
 
 
 
