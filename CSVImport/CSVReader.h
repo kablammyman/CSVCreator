@@ -3,32 +3,41 @@
 
 #include <string>
 #include <vector>
-
-struct CSVHeaderItem
+#include <map>
+class CSVMerger
 {
-	std::string csvHeaderName;
-	std::string newCsvName; //the new header field to put data into
-	int dropDownValue;
-	int csvIndex;
-	bool enabled;
-	HWND checkBox;
-	HWND inputField;
-	void Clear(void)
+	struct CSVHeaderItem
 	{
-		csvHeaderName.clear();
-		newCsvName.clear();
-	}
+		std::string csvHeaderName;
+		//int dropDownValue;
+		int csvIndex;
+		bool enabled;
+		HWND checkBox;
+		HWND inputField;
+
+	};
+	HINSTANCE mainInst;        
+	HWND mainWindowHandle;
+	HWND mergeButton;
+
+	bool isLoaded = false;
+	std::string internalDelim = "\t";
+	std::string newFilePath;
+
+	std::vector<CSVHeaderItem>CSVList;
+	std::vector<std::string> csvHeaderVec; 
+	std::vector<std::string> CSVEntryData;
+
+	//all the NEW csv header values, and where to get the data from the old csv
+	std::map<std::string, std::vector<int>> CSVDataIndexes;
+
+	std::string GetDataFromCSVLine(std::string csvLine, std::vector<int> indexes);
+	public:
+		bool IsDataLoaded() { return isLoaded; };
+		CSVMerger(std::string path, std::string newFile, std::string delim= "");
+		void InitMainWindow(HWND hDlg);
+		bool SaveCSV(std::string path);
+		bool LoadCSV(std::string path,char delim= '\t');
+		void OutpuNewCSV(std::string path);
+		BOOL CheckInput(WPARAM wParam, std::string &output);
 };
-
-extern std::vector<CSVHeaderItem>CSVList;
-extern HINSTANCE mainInst;        
-
-extern HWND mainWindowHandle;
-
-
-extern std::vector<std::string> csvHeaderVec; 
-extern std::vector<std::string> CSV;
-bool FillCSVHeaders(std::string path, std::vector<std::string> &csvHeaderVec, std::string delim= "\t");
-void InitMainWindow(HWND hDlg, std::vector<std::string> &csvHeader);
-bool SaveCSV(std::string path);
-bool LoadCSV(std::string path,char delim= '\t');
