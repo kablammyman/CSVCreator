@@ -6,7 +6,7 @@
 #include <map>
 class CSVMerger
 {
-	struct CSVHeaderItem
+	struct OrigCSVHeaderItem
 	{
 		std::string csvHeaderName;
 		//int dropDownValue;
@@ -16,6 +16,12 @@ class CSVMerger
 		HWND inputField;
 
 	};
+	struct NewCSVHeaderItem
+	{
+		std::string csvHeaderName;
+		std::vector<int> csvIndexOrigin;
+		int dataCombineType;//will we just concat strings, or dop something else
+	};
 	HINSTANCE mainInst;        
 	HWND mainWindowHandle;
 	HWND mergeButton;
@@ -24,12 +30,11 @@ class CSVMerger
 	std::string internalDelim = "\t";
 	std::string newFilePath;
 
-	std::vector<CSVHeaderItem>CSVList;
+	std::vector<OrigCSVHeaderItem>OrigCSVDataStructList;
+	std::vector<NewCSVHeaderItem>NewCSVDataStructList;
+
 	std::vector<std::string> csvHeaderVec; 
 	std::vector<std::string> CSVEntryData;
-
-	//all the NEW csv header values, and where to get the data from the old csv
-	std::map<std::string, std::vector<int>> CSVDataIndexes;
 
 	std::string GetDataFromCSVLine(std::string csvLine, std::vector<int> indexes);
 	public:

@@ -57,7 +57,7 @@ void CSVMerger::InitMainWindow(HWND hDlg)
 	int width = 50, height = 25;
 	for (size_t i = 0; i < csvHeaderVec.size(); i++)
 	{
-		CSVHeaderItem newItem;
+		OrigCSVHeaderItem newItem;
 
 		newItem.checkBox = CreateWindow(TEXT("BUTTON"), TEXT(csvHeaderVec[i].c_str()), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, xPos, yPos+(spacing*(i+1)), width+(csvHeaderVec[i].size()*8), checkSize, hDlg, (HMENU)(CHECKBOX_INDEX+i), NULL, NULL);
 		newItem.inputField = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER ,xPos +  width+(csvHeaderVec[i].size()*8)+10, yPos+(spacing*(i+1)),300 ,height , hDlg, (HMENU)(INPUTFILED_INDEX+i), NULL, NULL);
@@ -66,7 +66,7 @@ void CSVMerger::InitMainWindow(HWND hDlg)
 		//if (i == 0)
 		//	SendMessage(newItem.checkBox, BM_SETCHECK, BST_CHECKED, 0);
 
-		CSVList.push_back(newItem);
+		OrigCSVDataStructList.push_back(newItem);
 		//newItem.dropDown = CreateWindow(TEXT("COMBOBOX"),TEXT("csv hedaer"), WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST |  CBS_DROPDOWN | CBS_HASSTRINGS | WS_VSCROLL,
 		//	xPos + checkSize,yPos+(spacing*(i+1)),width,height,hDlg,(HMENU)DROPDOWN_INDEX+i, NULL, NULL);
 		//SetDlgItemText(mainWindowHandle, (INPUTFILED_INDEX+i), "This is a string");
@@ -82,7 +82,7 @@ string CSVMerger::GetDataFromCSVLine(string csvLine, vector<int> indexes)
 	vector<string> tokens = StringUtils::Tokenize(csvLine, internalDelim);
 	for (size_t i = 0; i < indexes.size(); i++)
 	{
-		ret += tokens[i] + " ";
+		ret += tokens[indexes[i]] + " ";
 	}
 	ret.pop_back();
 	return ret;
@@ -113,17 +113,18 @@ vector<int> CollectIndexesForDataEntry(vector<string> & vec,string newFieldName)
 
 void CSVMerger::OutpuNewCSV(string path)
 {
+	string outputDelim = ";";// internalDelim;
 	string line;
 	//first lets create the new header
 	int headerNameMaxSize = 100;
 	char* csvHeaderBuffer = new char[headerNameMaxSize];
-	CSVDataIndexes.clear();
+	NewCSVDataStructList.clear();
 	
 	string headerString;//this willbe printed inside the csv file
 
-	for (size_t i = 0; i < CSVList.size(); i++)
+	for (size_t i = 0; i < OrigCSVDataStructList.size(); i++)
 	{
-		UINT t = SendMessage(CSVList[i].checkBox, BM_GETCHECK, 0, 0);
+		UINT t = SendMessage(OrigCSVDataStructList[i].checkBox, BM_GETCHECK, 0, 0);
 		if (t == 1)//item is checked
 		{
 			int curInputFiledIndex = (INPUTFILED_INDEX + i);
@@ -132,11 +133,20 @@ void CSVMerger::OutpuNewCSV(string path)
 			if (numHeaderChars > 0)
 			{
 				string newName = csvHeaderBuffer;
-				headerString += newName + internalDelim;
-				CSVDataIndexes[newName].push_back(i);
-				CSVList[i].enabled = true;
+				headerString += newName + outputDelim;
+				
+				NewCSVHeaderItem newItem;
+				newItem.csvHeaderName = newName;
+				newItem.csvIndexOrigin.push_back(i);
+
+				NewCSVDataStructList.push_back(newItem);
+				OrigCSVDataStructList[i].enabled = true;
 			}
 			csvHeaderBuffer[0] = '\0';
+		}
+		else
+		{
+			OrigCSVDataStructList[i].enabled = false;
 		}
 	}
 	if (headerString.empty())
@@ -153,9 +163,9 @@ void CSVMerger::OutpuNewCSV(string path)
 	for (size_t i = 0; i < CSVEntryData.size(); i++)
 	{
 		string newLine;
-		for (it = CSVDataIndexes.begin(); it != CSVDataIndexes.end(); it++)
+		for (size_t j = 0; j < NewCSVDataStructList.size(); j++)
 		{
-			newLine += GetDataFromCSVLine(CSVEntryData[i], it->second) + internalDelim;
+			newLine += GetDataFromCSVLine(CSVEntryData[i], NewCSVDataStructList[j].csvIndexOrigin) + outputDelim;
 		}
 		newLine.pop_back();
 		myfile << newLine << endl;
