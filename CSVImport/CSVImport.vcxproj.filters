@@ -27,7 +27,13 @@
     <ClInclude Include="CSVImport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CSVReader.h">
+    <ClInclude Include="CSVImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSVImporterWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,7 +44,13 @@
     <ClCompile Include="CSVImport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CSVReader.cpp">
+    <ClCompile Include="CSVImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CSVImporterWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
