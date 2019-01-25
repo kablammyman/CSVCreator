@@ -15,4 +15,6 @@ public:
 	SQLHandler(std::string path);
 	void GetAllColsInTable(std::string table);
 	void InsertData(std::string table,std::vector<std::string> & dbFields,std::vector<std::string> & csvValues);
+	void Load(std::string path);
+	void Clear();
 };

@@ -6,15 +6,6 @@
 
 class CSVImporter
 {
-
-	struct NewCSVHeaderItem
-	{
-		std::string csvHeaderName;
-		std::vector<int> csvIndexOrigin;
-		int dataCombineType;//will we just concat strings, or dop something else
-	};
-	
-	
 	std::string csvPath;
 
 	bool isLoaded = false;
@@ -24,6 +15,14 @@ class CSVImporter
 	bool VectorContains(std::vector<std::string> & vec, std::string word);
 
 public:
+	struct NewCSVHeaderItem
+	{
+		std::string csvHeaderName;
+		std::vector<int> csvIndexOrigin;
+		int dataCombineType;//will we just concat strings, or dop something else
+		bool isDate;
+	};
+
 	CSVImporter(std::string path, std::string delim= "");
 	void LoadCSV(std::string path, std::string delim= "");
 
@@ -33,10 +32,11 @@ public:
 	std::vector<std::string> csvHeaderVec; 
 	std::vector<std::string> CSVEntryData;
 	void FillCSVDataVec(std::vector<int> &usedCSVHeader);
+	void AddNewCSVHeaderItem(NewCSVHeaderItem newItem);
+	void AddNewCSVHeaderItem(std::string name, int index, bool _isDate, int dataComboType);
 	std::string GetDataFromCSVLine(std::string csvLine, std::vector<int> indexes);
 	void GetDataFromCSVLine(std::string csvLine, std::vector<int> indexes, std::vector<std::string>&retData);
-
+	void GetDataFromCSVLine(std::string csvLine, std::vector<std::string>&retData);
 	bool IsDataLoaded() { return isLoaded; };
-
-	void OutpuNewCSV(std::string path,std::vector<std::string> &usedCSVHeader );
+	void ClearHeaders();
 };

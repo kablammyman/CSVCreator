@@ -5,6 +5,12 @@ using namespace std;
 
 SQLHandler::SQLHandler(string path)
 {
+	Load(path);
+}
+
+void SQLHandler::Load(string path)
+{
+	Clear();
 	ctlr.OpenDB(path);
 	ctlr.GetAllTablesInDB(tables);
 }
@@ -28,4 +34,12 @@ void SQLHandler::InsertData(string table, std::vector<std::string> & dbFields,st
 	}
 
 	ctlr.InsertNewDataEntry(table,data, output);
+}
+void SQLHandler::Clear()
+{
+	dbPath.clear();
+	tables.clear();
+	cols.clear();
+	//DatabaseController ctlr;
+
 }

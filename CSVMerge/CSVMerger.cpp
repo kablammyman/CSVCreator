@@ -186,7 +186,53 @@ void CSVMerger::OutpuNewCSV(string path)
 	
 	myfile.close();
 }
+/*
+void CSVImporter::OutpuNewCSV(string path,vector<string> &usedCSVHeader )
+{
+	string outputDelim = ";";// internalDelim;
+	string line;
+	NewCSVDataStructList.clear();
+	
+	string headerString;//this willbe printed inside the csv file
 
+	for (size_t i = 0; i < usedCSVHeader.size(); i++)
+	{
+		string newName = usedCSVHeader[i];
+		headerString += newName + outputDelim;
+				
+		NewCSVHeaderItem newItem;
+		newItem.csvHeaderName = newName;
+		newItem.csvIndexOrigin.push_back(i);
+
+		NewCSVDataStructList.push_back(newItem);
+	}
+
+	if (headerString.empty())
+	{
+		MessageBox(NULL, _T("you didnt specify what thigns you wanted"),_T("error"),MB_OK|MB_SYSTEMMODAL);
+		return;
+	}
+	headerString.pop_back();
+	ofstream myfile (path);
+
+	myfile << headerString << endl;
+	//next start filling out the data
+
+	for (size_t i = 0; i < CSVEntryData.size(); i++)
+	{
+		string newLine;
+		for (size_t j = 0; j < NewCSVDataStructList.size(); j++)
+		{
+			newLine += GetDataFromCSVLine(CSVEntryData[i], NewCSVDataStructList[j].csvIndexOrigin) + outputDelim;
+		}
+		newLine.pop_back();
+		myfile << newLine << endl;
+	}
+
+	
+	myfile.close();
+}
+*/
 BOOL CSVMerger::CheckInput(WPARAM wParam, string &output)
 {
 	if (wParam == IDC_MERGE_CSV_BUTTON)

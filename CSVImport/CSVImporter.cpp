@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CSVImporter.h"
 #include "StringUtils.h"
+#include "DateTime.h"
 
 
 #include <fstream>
@@ -16,8 +17,11 @@ void CSVImporter::LoadCSV(string path,string delim)
 {
 	if (delim.empty())
 		delim = internalDelim;
-	
+	else
+		internalDelim = delim;
+
 	csvHeaderVec.clear();
+
 	csvPath = path;
 
 	ifstream myfile (path);
@@ -42,14 +46,6 @@ void CSVImporter::LoadCSV(string path,string delim)
 	}
 	myfile.close();
 
-	/*for (int i = 0; i < csvHeaderVec.size(); i++)
-	{
-		CSVHeaderItem temp;
-		temp.csvHeaderName = csvHeaderVec[i];
-		temp.enabled = false;
-		temp.csvIndex = i;
-		CSVList.push_back(temp);
-	}*/
 	isLoaded = true;
 }
 
@@ -72,6 +68,37 @@ void CSVImporter::GetDataFromCSVLine(string csvLine, vector<int> indexes, vector
 	for (size_t i = 0; i < indexes.size(); i++)
 	{
 		retData.push_back( tokens[indexes[i]]);
+	}
+}
+
+void CSVImporter::GetDataFromCSVLine(string csvLine, vector<string>&retData)
+{
+	vector<string> tokens = StringUtils::Tokenize(csvLine, internalDelim);
+
+	//when the data given has some blank fields at the end, fill in the gaps
+	if (tokens.size() < NewCSVDataStructList.size())
+	{
+		for (size_t i = 0; i < NewCSVDataStructList.size() - tokens.size(); i++)
+			tokens.push_back("");
+	}
+	for (size_t i = 0; i < NewCSVDataStructList.size(); i++)
+	{
+		for (size_t j = 0; j < NewCSVDataStructList[i].csvIndexOrigin.size(); j++)
+		{
+			int curDataIndex = NewCSVDataStructList[i].csvIndexOrigin[j];
+			string curToken;
+			if (NewCSVDataStructList[i].isDate)
+			{
+				DateTime date(tokens[curDataIndex]);
+				curToken = date.ToString();
+			}
+			else
+			{
+				curToken = tokens[curDataIndex];
+			}
+			retData.push_back( curToken);
+		}
+		
 	}
 }
 
@@ -113,48 +140,34 @@ void CSVImporter::FillCSVDataVec(vector<int> &usedCSVHeader )
 	}
 }
 
-void CSVImporter::OutpuNewCSV(string path,vector<string> &usedCSVHeader )
+void CSVImporter::AddNewCSVHeaderItem(string name,int index,bool _isDate, int dataComboType)
 {
-	string outputDelim = ";";// internalDelim;
-	string line;
+	NewCSVHeaderItem *newItem = nullptr;
+	//check to see if this entry is already in the list
+	for (size_t i = 0; i < NewCSVDataStructList.size(); i++)
+	{
+		if (name == NewCSVDataStructList[i].csvHeaderName)
+			newItem = &NewCSVDataStructList[i];
+	}
+	if (newItem == nullptr)
+	{
+		NewCSVHeaderItem nextItem;
+		NewCSVDataStructList.push_back(nextItem);
+		newItem = &NewCSVDataStructList.back();
+	}
+
+	newItem->csvHeaderName = name;
+	newItem->csvIndexOrigin.push_back(index);
+	newItem->dataCombineType = dataComboType;
+	newItem->isDate = _isDate;
+}
+
+void CSVImporter::AddNewCSVHeaderItem(NewCSVHeaderItem newItem )
+{
+	NewCSVDataStructList.push_back(newItem);	
+}
+
+void CSVImporter::ClearHeaders()
+{
 	NewCSVDataStructList.clear();
-	
-	string headerString;//this willbe printed inside the csv file
-
-	for (size_t i = 0; i < usedCSVHeader.size(); i++)
-	{
-		string newName = usedCSVHeader[i];
-		headerString += newName + outputDelim;
-				
-		NewCSVHeaderItem newItem;
-		newItem.csvHeaderName = newName;
-		newItem.csvIndexOrigin.push_back(i);
-
-		NewCSVDataStructList.push_back(newItem);
-	}
-
-	if (headerString.empty())
-	{
-		MessageBox(NULL, _T("you didnt specify what thigns you wanted"),_T("error"),MB_OK|MB_SYSTEMMODAL);
-		return;
-	}
-	headerString.pop_back();
-	ofstream myfile (path);
-
-	myfile << headerString << endl;
-	//next start filling out the data
-
-	for (size_t i = 0; i < CSVEntryData.size(); i++)
-	{
-		string newLine;
-		for (size_t j = 0; j < NewCSVDataStructList.size(); j++)
-		{
-			newLine += GetDataFromCSVLine(CSVEntryData[i], NewCSVDataStructList[j].csvIndexOrigin) + outputDelim;
-		}
-		newLine.pop_back();
-		myfile << newLine << endl;
-	}
-
-	
-	myfile.close();
 }

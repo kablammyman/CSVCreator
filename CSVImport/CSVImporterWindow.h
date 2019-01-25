@@ -16,15 +16,17 @@ class CSVImporterWIndow
 	std::string csvFilePath, dbFilePath;
 	std::string GetSelectedValueFromDropdown(HWND dropdown);
 	std::string tableName;
+	std::string delim;
 public:
+
+	//each csv entry will get one of these structs...the struct tells us what options the user selected\want
 	struct OrigCSVHeaderItem
 	{
 		std::string csvHeaderName;
-		//int dropDownValue;
 		int csvIndex;
-		bool enabled;
-		HWND checkBox;
-		HWND inputField;
+		bool enabled;//when processing, did the user want ot use this by slecting an item on the drop down?
+		HWND isDateCheckBox;//is this csv field a date? if so, we must make sure we convert it by using the DateTime class (in sqlite utils)
+		HWND dropDownMenu;
 	};
 
 	HINSTANCE mainInst;        
@@ -35,22 +37,19 @@ public:
 	HWND browseToSQL;
 	HWND processButton;
 	HWND dbTableDropDown;
+	HWND delimterType;
 
 	CSVImporter *csvImporter;
 	SQLHandler *sqlHandler;
 
 	std::vector<OrigCSVHeaderItem>OrigCSVDataStructList;
-
+	void ClearOrigCSVDataStructList();
 	CSVImporterWIndow();
 
 	void InitMainWindow(HWND hDlg);
 	void InitSQLTableWindow(HWND hDlg);
 	void InitDataWindow(HWND nDlg);
 
-	bool SaveCSV(std::string path);
-	bool LoadCSV(std::string path,char delim= '\t');
-	
-	void OutpuNewCSV(std::string path);
 	void ImportCSVDataToDB();
 	
 	BOOL CheckCsvFileInput();

@@ -24,10 +24,10 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CSVReader.h">
+    <ClInclude Include="CSVMerge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CSVMerge.h">
+    <ClInclude Include="CSVMerger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +35,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CSVReader.cpp">
+    <ClCompile Include="CSVMerge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CSVMerge.cpp">
+    <ClCompile Include="CSVMerger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
