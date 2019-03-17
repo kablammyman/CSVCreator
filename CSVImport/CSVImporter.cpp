@@ -73,7 +73,21 @@ void CSVImporter::GetDataFromCSVLine(string csvLine, vector<int> indexes, vector
 
 void CSVImporter::GetDataFromCSVLine(string csvLine, vector<string>&retData)
 {
-	vector<string> tokens = StringUtils::Tokenize(csvLine, internalDelim);
+	vector<string> tokens = StringUtils::Tokenize2(csvLine, internalDelim);
+	//count the delmiters to check if we have some empty fields...empty fields throw off the indexing
+	int numDelims = 0;
+	size_t found = 0;
+	while(found < csvLine.size())
+	{
+		found = csvLine.find(internalDelim, found + 1);
+		if (found != string::npos)
+			numDelims++;
+	}
+	//got some empty data....
+	if (tokens.size() != numDelims + 1)
+	{
+
+	}
 
 	//when the data given has some blank fields at the end, fill in the gaps
 	if (tokens.size() < NewCSVDataStructList.size())
@@ -81,6 +95,9 @@ void CSVImporter::GetDataFromCSVLine(string csvLine, vector<string>&retData)
 		for (size_t i = 0; i < NewCSVDataStructList.size() - tokens.size(); i++)
 			tokens.push_back("");
 	}
+	
+	
+
 	for (size_t i = 0; i < NewCSVDataStructList.size(); i++)
 	{
 		for (size_t j = 0; j < NewCSVDataStructList[i].csvIndexOrigin.size(); j++)
@@ -94,7 +111,10 @@ void CSVImporter::GetDataFromCSVLine(string csvLine, vector<string>&retData)
 			}
 			else
 			{
-				curToken = tokens[curDataIndex];
+				if (curDataIndex < tokens.size())
+					curToken = tokens[curDataIndex];
+				else
+					curToken = "";
 			}
 			retData.push_back( curToken);
 		}
