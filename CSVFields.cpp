@@ -2,7 +2,7 @@
 #include "CSVFields.h"
 
 #include "Resource.h"
-
+#include "CSVHandler.h"
 #include "StringUtils.h"
 #include <string>
 #include <vector>
@@ -40,10 +40,10 @@ using namespace std;
 	int X = 5, Y = 10;
 	int textAreaWidth = winWidth/2;
 	int textAreaHeight = winHeight;
-	bool testData = false;
-	int textHeeight= 20;
+	bool testData = true;
+	int textHeight= 20;
 	int longInput = 1000;
-	int ButtonY = Y+textAreaHeight+textHeeight+15;
+	int ButtonY = Y+textAreaHeight+textHeight+80;
 	string numEntriesText = "Entries: ";
 string GetNumEntriesText()
 {
@@ -77,7 +77,7 @@ void UpdateListView( )
 	int colWidth = 100;
 	if(csvHeaderVec.size() > 0)
 		colWidth =  width/csvHeaderVec.size();
-	listView= CreateListView(mainWindowHandle, csvHeaderVec,X, ButtonY + 30, width,textAreaHeight,colWidth);
+	listView= CreateListView(mainWindowHandle, csvHeaderVec,X, ButtonY + 50, width,textAreaHeight,colWidth);
 }
 void InitMainWindows(HWND hDlg)
 {
@@ -158,18 +158,23 @@ void InitMainWindows(HWND hDlg)
 		defaultInput.clear();
 	}
 	int buttonHeight = 25;
-	csvHeader = CreateWindow(TEXT("STATIC"), TEXT("CSV Header Tempalte"), WS_CHILD | WS_VISIBLE ,X + 10, Y,textAreaWidth ,textHeeight , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
-	csvHeaderText = CreateWindow(TEXT("Edit"), TEXT(defualtCSVHeader.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER, X + (8*19), Y, longInput, textHeeight, hDlg, (HMENU)IDC_CSV_HEADER_TEXT, NULL, NULL);
-	CreateWindow(TEXT("BUTTON"), TEXT("set header"), WS_VISIBLE | WS_CHILD,  X + (8*19)+longInput+10,Y, 100, buttonHeight, hDlg, (HMENU)IDC_EXECUTE_CSV_HEADER_BUTTON, NULL, NULL);
+	int xoffset = 8*19;
+	csvHeader = CreateWindow(TEXT("STATIC"), TEXT("CSV Header Tempalte"), WS_CHILD | WS_VISIBLE ,X + 10, Y,textAreaWidth ,textHeight , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
+	csvHeaderText = CreateWindow(TEXT("Edit"), TEXT(defualtCSVHeader.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER, X + (xoffset), Y, longInput, textHeight, hDlg, (HMENU)IDC_CSV_HEADER_TEXT, NULL, NULL);
+	CreateWindow(TEXT("BUTTON"), TEXT("set header"), WS_VISIBLE | WS_CHILD,  X + (xoffset)+longInput+10,Y, 100, buttonHeight, hDlg, (HMENU)IDC_EXECUTE_CSV_HEADER_BUTTON, NULL, NULL);
 
-
-	editArea = CreateWindow(TEXT("EDIT"), TEXT(defaultInput.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, X, Y+textHeeight*2,textAreaWidth ,textAreaHeight , hDlg,  // use WM_SIZE and MoveWindow() to size
+	int textBoxPos = Y+textHeight*4;
+	CreateWindow(TEXT("STATIC"), TEXT("Data for csv entry"), WS_CHILD | WS_VISIBLE ,X + 10, textBoxPos - 50 ,textAreaWidth,20 , hDlg, NULL, NULL, NULL);
+	editArea = CreateWindow(TEXT("EDIT"), TEXT(defaultInput.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, 
+	X, textBoxPos,textAreaWidth ,textAreaHeight , hDlg,  // use WM_SIZE and MoveWindow() to size
 	(HMENU)IDC_EDIT_TEXT_WINDOW, GetModuleHandle(NULL), NULL );
 
-	templateArea = CreateWindow(TEXT("EDIT"), TEXT(defualtTemplate.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, textAreaWidth + 10, Y+textHeeight*2,textAreaWidth ,textAreaHeight , hDlg,
+	CreateWindow(TEXT("STATIC"), TEXT("template on how to parse data (set [tags] + header at same time!)"), WS_CHILD | WS_VISIBLE ,textAreaWidth + 10, textBoxPos - 50 ,textAreaWidth,20 , hDlg, NULL, NULL, NULL);
+	templateArea = CreateWindow(TEXT("EDIT"), TEXT(defualtTemplate.c_str()), WS_CHILD | WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE  | WS_VSCROLL | WS_HSCROLL, 
+	textAreaWidth + 10, textBoxPos,textAreaWidth ,textAreaHeight , hDlg,
 	(HMENU)IDC_TEMPLATE_WINDOW, GetModuleHandle(NULL), NULL );
 	
-	numEntriesView = CreateWindow(TEXT("STATIC"), TEXT(GetNumEntriesText().c_str()), WS_CHILD | WS_VISIBLE ,X + 10+ (textAreaWidth * 2.5), Y+(textHeeight*2),100 ,25 , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
+	numEntriesView = CreateWindow(TEXT("STATIC"), TEXT(GetNumEntriesText().c_str()), WS_CHILD | WS_VISIBLE ,X + 10+ (textAreaWidth * 2.5), Y+(textHeight*2),100 ,25 , hDlg, (HMENU)IDC_CSV_HEADER, NULL, NULL);
 	
 	
 	CreateWindow(TEXT("BUTTON"), TEXT("submit"), WS_VISIBLE | WS_CHILD, X,ButtonY, 100, buttonHeight, hDlg, (HMENU)IDC_EXECUTE_CSV_INPUT_BUTTON, NULL, NULL);
@@ -474,32 +479,25 @@ BOOL FillListViewItems(HWND hWndListView, vector<string> items)
 }
 bool SaveCSV(string path)
 {
-	ofstream myfile;
-	myfile.open (path);
-	if(!myfile.is_open())
-		return false;
+	CSVHandler csv;
+	
+	csv.CreateCSVFile(path, csvHeaderVec, ',',true);
+	map<string, string> dict;
 
-
-	for(size_t i = 0; i < csvHeaderVec.size(); i++)
-	{
-		myfile << csvHeaderVec[i] << "\t";
-	}
-	myfile << endl;
+	for (size_t i = 0; i < csvHeaderVec.size(); i++)
+		dict[csvHeaderVec[i]] = "temp";
 
 	for(size_t i = 0; i < CSV.size(); i++)
 	{
-		string line = "";
-		//didnt feel like using algo .replace
-		for(int j = 0; j < CSV[i].size(); j++)
+		vector<string> tokens = StringUtils::Tokenize(CSV[i], '|');
+
+		for (int j = 0; j < tokens.size(); j++)
 		{
-			if(CSV[i][j] == internalDelim[0])
-				line += "\t";
-			else
-				line += CSV[i][j];
+			dict[csvHeaderVec[j]] = tokens[j];
 		}
-		myfile << line << "\n";
+
+		csv.WriteCSVEntry(dict);
 	}
-	myfile.close();
 
 	return true;
 }
@@ -507,47 +505,29 @@ bool SaveCSV(string path)
 //delim is a dafu;lt parm with the tab char. we can override it to read in other things like commas or something
 bool LoadCSV(string path, char delim)
 {
-	ifstream myfile (path);
-	string line;
-
-	if (!myfile.is_open())
+	CSVHandler csv;
+	if(!csv.ReadCSVFile(path,delim))
 		return false;
-	
-	bool headerLine = true;
+		
+	SetDlgItemText(mainWindowHandle, IDC_CSV_HEADER_TEXT, csv.GetCsvHeaderString().c_str());
+	csvHeaderVec.clear();
+	csvHeaderVec = csv.GetCSVHeader();
 
-	while ( getline (myfile,line) )
+	UpdateListView();
+		
+	SetDlgItemText(numEntriesView, IDC_NUM_ENTRIES_VIEW, to_string(csv.GetCSVLength()).c_str());
+	CSV.clear();
+	for (size_t i = 0; i < csv.GetCSVLength(); i++)
 	{
-		string temp = "";
-		for(int j = 0; j < line.size(); j++)
+		vector<string> tokens = csv.GetCSVLineAsVector(i);
+		string line;
+		for (size_t j = 0; j < tokens.size(); j++)
 		{
-			if(line[j] == delim)
-			{
-				if(!headerLine)
-					temp += internalDelim;
-				else
-					temp += ',';
-			}
-			else
-				temp += line[j];
+			line += tokens[j] + internalDelim;
 		}
-
-		if(headerLine)
-		{
-			SetDlgItemText(mainWindowHandle, IDC_CSV_HEADER_TEXT, temp.c_str());
-			csvHeaderVec.clear();
-			string d;
-			d.push_back(delim);
-			csvHeaderVec = StringUtils::Tokenize(line,d);
-			headerLine = false;
-			UpdateListView();
-		}
-		else
-		{
-			CSV.push_back(temp);
-		}
+		CSV.push_back(line);
 	}
-	myfile.close();
-
-	SetDlgItemText(numEntriesView, IDC_NUM_ENTRIES_VIEW, GetNumEntriesText().c_str());
+	
+	
 	return false;
 }

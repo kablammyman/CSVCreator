@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "CSVReader.h"
 #include "StringUtils.h"
 #include "Resource.h"
+#include "CSVMerger.h"
 
 #include <fstream>
 #include <iostream>
@@ -56,16 +56,16 @@ void CSVMerger::InitMainWindow(HWND hDlg)
 	int spacing = 35;
 	int width = 50, height = 25;
 	//64 is 8 chars x 8pixels per char
-	CreateWindow(TEXT("STATIC"), TEXT("CSV Path"), WS_CHILD | WS_VISIBLE, xPos, 10, width+64, 20, hDlg, (HMENU)(CHECKBOX_INDEX-3), NULL, NULL);
+	CreateWindow(TEXT("STATIC"), TEXT("CSV 1 Path"), WS_CHILD | WS_VISIBLE, xPos, 10, width+64, 20, hDlg, (HMENU)(CHECKBOX_INDEX-3), NULL, NULL);
 	CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER ,xPos +74,10,600 ,height , hDlg, (HMENU)(INPUTFILED_INDEX-3), NULL, NULL);
 
-	CreateWindow(TEXT("STATIC"), TEXT("SQLite DB path"), WS_CHILD | WS_VISIBLE, xPos, height*2, 64, checkSize, hDlg, (HMENU)(CHECKBOX_INDEX-2), NULL, NULL);
+	CreateWindow(TEXT("STATIC"), TEXT("CSV 2 Path"), WS_CHILD | WS_VISIBLE, xPos, height*2, 64, checkSize, hDlg, (HMENU)(CHECKBOX_INDEX-2), NULL, NULL);
 	CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER ,xPos + 74, height*2,600 ,height , hDlg, (HMENU)(INPUTFILED_INDEX-2), NULL, NULL);
 
 	//CreateWindow(TEXT("TEXT"), TEXT("SQLite DB path"), WS_CHILD | WS_VISIBLE, xPos, yPos-(spacing*(i+1)), width+(csvHeaderVec[i].size()*8), checkSize, hDlg, (HMENU)(CHECKBOX_INDEX-1), NULL, NULL);
 	//CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER ,xPos +  width+(csvHeaderVec[i].size()*8)+10, yPos+(spacing*(i+1)),300 ,height , hDlg, (HMENU)(INPUTFILED_INDEX+i), NULL, NULL);
 
-	CreateWindow(TEXT("TEXT"), TEXT("CSV Hedaer"), WS_CHILD | WS_VISIBLE, xPos, 30, 80, checkSize, hDlg, (HMENU)(CHECKBOX_INDEX-1), NULL, NULL);
+	CreateWindow(TEXT("TEXT"), TEXT("New CSV Hedaer"), WS_CHILD | WS_VISIBLE, xPos, 30, 80, checkSize, hDlg, (HMENU)(CHECKBOX_INDEX-1), NULL, NULL);
 	
 
 	for (size_t i = 0; i < csvHeaderVec.size(); i++)

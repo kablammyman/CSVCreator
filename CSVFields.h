@@ -63,4 +63,4 @@ BOOL CheckInput(WPARAM wParam, std::string &output);
 HWND CreateListView(HWND hwndParent, std::vector<std::string> colNames,int x, int y, int w, int h, int size);
 BOOL FillListViewItems(HWND hWndListView, std::vector<std::string> items);
 bool SaveCSV(std::string path);
-bool LoadCSV(std::string path,char delim= '\t');
+bool LoadCSV(std::string path,char delim= ',');

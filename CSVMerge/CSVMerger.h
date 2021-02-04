@@ -42,7 +42,7 @@ class CSVMerger
 		CSVMerger(std::string path, std::string newFile, std::string delim= "");
 		void InitMainWindow(HWND hDlg);
 		bool SaveCSV(std::string path);
-		bool LoadCSV(std::string path,char delim= '\t');
+		bool LoadCSV(std::string path,char delim= ',');
 		void OutpuNewCSV(std::string path);
 		BOOL CheckInput(WPARAM wParam, std::string &output);
 };

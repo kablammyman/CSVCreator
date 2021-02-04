@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSVCreator", "CSVCreator.vcxproj", "{6B50B32D-70EE-4FAC-BDEA-320A7EF7D04E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSVImport", "CSVImport\CSVImport.vcxproj", "{6792482F-D087-4164-837A-6B51DA8EC26D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSVMerge", "CSVMerge\CSVMerge.vcxproj", "{86A4DCCF-0B70-4DE9-8C76-1CF136A1E162}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientKit", "ClientKit\ClientKit.vcxproj", "{F57C8DB0-0D8B-4200-94A3-74201AB312A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{86A4DCCF-0B70-4DE9-8C76-1CF136A1E162}.Release|x64.Build.0 = Release|x64
 		{86A4DCCF-0B70-4DE9-8C76-1CF136A1E162}.Release|x86.ActiveCfg = Release|Win32
 		{86A4DCCF-0B70-4DE9-8C76-1CF136A1E162}.Release|x86.Build.0 = Release|Win32
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Debug|x64.ActiveCfg = Debug|x64
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Debug|x64.Build.0 = Debug|x64
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Debug|x86.Build.0 = Debug|Win32
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Release|x64.ActiveCfg = Release|x64
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Release|x64.Build.0 = Release|x64
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Release|x86.ActiveCfg = Release|Win32
+		{F57C8DB0-0D8B-4200-94A3-74201AB312A9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
